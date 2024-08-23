@@ -3,7 +3,6 @@ const request = require("supertest");
 const data = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const app = require("../app");
-const supertest = require("supertest");
 
 beforeEach(() => {
   return seed(data);
@@ -15,7 +14,7 @@ afterAll(() => {
 
 describe("GET: /api/topics", () => {
   test("200: responds with all of the topics", () => {
-    return supertest(app)
+    return request(app)
       .get("/api/topics")
       .expect(200)
       .then(({ body: { topics } }) => {
