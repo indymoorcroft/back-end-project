@@ -25,7 +25,7 @@ describe("GET: /api", () => {
 });
 
 describe("GET: /api/topics", () => {
-  test("200: responds with all of the topics", () => {
+  test("200: responds with all of the topicsin an array", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
@@ -43,13 +43,45 @@ describe("GET: /api/topics", () => {
   });
 });
 
+describe("GET: /api/articles", () => {
+  test("200: responds with all of the articles in an array", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("200: responds with all of the articles sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
 describe("GET: /api/articles/:article_id", () => {
   test("200: responds with article object that matches the given id", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then(({ body: { article } }) => {
-        console.log(article);
         expect(article).toEqual(
           expect.objectContaining({
             article_id: 1,
