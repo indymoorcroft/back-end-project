@@ -102,7 +102,7 @@ describe("GET: /api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid Request");
+        expect(msg).toBe("Article not found");
       });
   });
   test("400: responds with an appropriate error message when given an invalid id", () => {
@@ -141,7 +141,7 @@ describe("GET: /api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid Request");
+        expect(msg).toBe("Article not found");
       });
   });
   test("400: responds with an appropriate error message when given an invalid id", () => {
@@ -167,6 +167,42 @@ describe("GET: /api/articles/:article_id/comments", () => {
       .expect(200)
       .then(({ body: { comments } }) => {
         expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
+describe("POST: /api/articles/:article_id/comments", () => {
+  test("200: adds a comment for an article and responds with the posted comment", () => {
+    const newComment = {
+      username: "icellusedkars",
+      body: "Hit me up if you wanna sell your wheelz",
+    };
+    return request(app)
+      .post("/api/articles/9/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            body: "Hit me up if you wanna sell your wheelz",
+            article_id: 9,
+            author: "icellusedkars",
+            votes: 0,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  test("400: responds with an appropriate status and error message when provided without a body", () => {
+    return request(app)
+      .post("/api/articles/9/comments")
+      .send({
+        username: "icellusedkars",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
       });
   });
 });
