@@ -56,5 +56,18 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a comments to a selected article based on id",
+    "example response": {
+      "comment": {
+        "comment_id": 19,
+        "body": "Hit me up if you wanna sell your wheelz",
+        "article_id": 9,
+        "author": "icellusedkars",
+        "votes": 0,
+        "created_at": "2024-08-27T15:32:15.331Z"
+      }
+    }
   }
 }
