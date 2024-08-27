@@ -10,10 +10,22 @@ exports.selectCommentsById = (id) => {
   queryProms.push(db.query(queryStr, [id]));
 
   return Promise.all(queryProms).then((results) => {
-    if (queryProms.length === 1) {
+    if (results.length === 1) {
       return results[0].rows;
     } else {
       return results[1].rows;
     }
   });
+};
+
+exports.createNewComment = (comment, id) => {
+  const { username, body } = comment;
+  return db
+    .query(
+      `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *`,
+      [body, id, username]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
 };
