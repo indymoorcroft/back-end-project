@@ -23,7 +23,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
+    "description": "serves an array of all articles. Articles can be sorted by each column, ordered ascending or descending, and filtered by topic",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [

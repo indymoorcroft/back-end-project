@@ -1,6 +1,7 @@
 const db = require("../db/connection");
+const { checkExists } = require("../db/seeds/utils");
 
-exports.selectAllArticles = (sort_by = "created_at", order) => {
+exports.selectAllArticles = (sort_by = "created_at", order, topic) => {
   const validSortBys = [
     "title",
     "topic",
@@ -15,11 +16,18 @@ exports.selectAllArticles = (sort_by = "created_at", order) => {
   }
 
   let queryStr =
-    "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.votes >= 0 GROUP BY articles.article_id";
+    "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
 
-  let queryVals = [];
+  const queryVals = [];
+  const queryProms = [];
 
-  queryStr += ` ORDER BY ${sort_by}`;
+  if (topic) {
+    queryStr += ` WHERE articles.topic = $1`;
+    queryVals.push(topic);
+    queryProms.push(checkExists("articles", "topic", topic));
+  }
+
+  queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by}`;
 
   if (order === "asc") {
     queryStr += " ASC";
@@ -29,8 +37,14 @@ exports.selectAllArticles = (sort_by = "created_at", order) => {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
-  return db.query(queryStr, queryVals).then(({ rows }) => {
-    return rows;
+  queryProms.push(db.query(queryStr, queryVals));
+
+  return Promise.all(queryProms).then((results) => {
+    if (results.length === 1) {
+      return results[0].rows;
+    } else {
+      return results[1].rows;
+    }
   });
 };
 
@@ -39,7 +53,7 @@ exports.selectArticleById = (id) => {
     .query("SELECT * FROM articles WHERE article_id = $1", [id])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ msg: "Article not found" });
+        return Promise.reject({ status: 404, msg: "Data not found" });
       } else {
         return rows[0];
       }
@@ -55,7 +69,7 @@ exports.updateArticleVote = (body, id) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ msg: "Article not found" });
+        return Promise.reject({ status: 404, msg: "Data not found" });
       } else {
         return rows[0];
       }
