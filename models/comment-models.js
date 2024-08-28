@@ -32,13 +32,10 @@ exports.createNewComment = (comment, id) => {
 
 exports.removeCommentById = (id) => {
   return db
-    .query("SELECT * FROM comments where comment_id = $1", [id])
+    .query("DELETE FROM comments WHERE comment_id = $1 RETURNING *", [id])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ msg: "Comment not found" });
+        return Promise.reject({ status: 404, msg: "Data not found" });
       }
-      return db.query("DELETE FROM comments WHERE comment_id = $1", [
-        rows[0].comment_id,
-      ]);
     });
 };

@@ -98,20 +98,43 @@ describe("GET: /api/articles", () => {
         expect(articles).toBeSortedBy("topic", { ascending: true });
       });
   });
-  test("400: responds with an appropriate error message when given an invalid sort_by query", () => {
+  test("200: responds with articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              topic: "mitch",
+            })
+          );
+        });
+      });
+  });
+  test("404: responds with an appropriate error message when given an invalid sort_by query", () => {
     return request(app)
       .get("/api/articles?sort_by=invalid")
-      .expect(400)
+      .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad request");
       });
   });
-  test("400: responds with an appropriate error message when given an invalid order query", () => {
+  test("404: responds with an appropriate error message when given an invalid order query", () => {
     return request(app)
       .get("/api/articles?order=invalid")
-      .expect(400)
+      .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: responds with an appropriate error message when given an invalid topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=notatopic")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
       });
   });
 });
@@ -162,7 +185,7 @@ describe("GET: /api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Article not found");
+        expect(msg).toBe("Data not found");
       });
   });
   test("400: responds with an appropriate error message when given an invalid id", () => {
@@ -201,7 +224,7 @@ describe("GET: /api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Article not found");
+        expect(msg).toBe("Data not found");
       });
   });
   test("400: responds with an appropriate error message when given an invalid id", () => {
@@ -349,7 +372,7 @@ describe("PATCH: /api/articles/:article_id", () => {
       })
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Article not found");
+        expect(msg).toBe("Data not found");
       });
   });
 });
@@ -363,7 +386,7 @@ describe("DELETE: /api/comments/:comment_id", () => {
       .delete("/api/comments/999")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Comment not found");
+        expect(msg).toBe("Data not found");
       });
   });
   test("400: responds with an appropriate status and error message when given an invalid id", () => {
