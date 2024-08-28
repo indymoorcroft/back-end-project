@@ -38,6 +38,8 @@ app.delete("/api/comments/:comment_id", deleteCommentById);
 app.use((err, req, res, next) => {
   if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad Request" });
+  } else if (err.code === "23503") {
+    res.status(404).send({ msg: "Data not found" });
   } else {
     next(err);
   }

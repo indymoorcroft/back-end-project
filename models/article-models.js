@@ -30,6 +30,10 @@ exports.updateArticleVote = (body, id) => {
       [voteChange, id]
     )
     .then(({ rows }) => {
-      return rows[0];
+      if (rows.length === 0) {
+        return Promise.reject({ msg: "Article not found" });
+      } else {
+        return rows[0];
+      }
     });
 };
