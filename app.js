@@ -3,6 +3,7 @@ const { getTopics } = require("./controllers/topic-controllers");
 const {
   getArticles,
   getArticleById,
+  patchArticleVote,
 } = require("./controllers/article-controllers");
 const {
   getCommentsById,
@@ -25,6 +26,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsById);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", patchArticleVote);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02" || err.code === "23502") {

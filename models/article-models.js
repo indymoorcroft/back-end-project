@@ -21,3 +21,15 @@ exports.selectArticleById = (id) => {
       }
     });
 };
+
+exports.updateArticleVote = (body, id) => {
+  const voteChange = Object.values(body)[0];
+  return db
+    .query(
+      "UPDATE articles SET votes = $1 + votes WHERE article_id = $2 RETURNING *",
+      [voteChange, id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};

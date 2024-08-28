@@ -172,7 +172,7 @@ describe("GET: /api/articles/:article_id/comments", () => {
 });
 
 describe("POST: /api/articles/:article_id/comments", () => {
-  test("200: adds a comment for an article and responds with the posted comment", () => {
+  test("201: adds a comment for an article and responds with the posted comment", () => {
     const newComment = {
       username: "icellusedkars",
       body: "Hit me up if you wanna sell your wheelz",
@@ -199,6 +199,35 @@ describe("POST: /api/articles/:article_id/comments", () => {
       .post("/api/articles/9/comments")
       .send({
         username: "icellusedkars",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("PATCH: /api/articles/:article_id", () => {
+  test("200: updates the article vote value based on the article id", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toEqual(
+          expect.objectContaining({
+            votes: 101,
+          })
+        );
+      });
+  });
+  test("400: responds with an appropriate status and error message when provided with the wrong data type", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({
+        inc_votes: "not a number",
       })
       .expect(400)
       .then(({ body: { msg } }) => {
