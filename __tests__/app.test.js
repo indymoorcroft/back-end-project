@@ -66,12 +66,52 @@ describe("GET: /api/articles", () => {
         });
       });
   });
-  test("200: responds with all of the articles sorted by date in descending order", () => {
+  test("200: responds with all of the articles sorted by date in descending order by default", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: responds with all of the articles sorted by the column given", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("title", { descending: true });
+      });
+  });
+  test("200: responds with all of the articles in the appropriate order when called with the order query", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
+  test("200: responds with all of the articles sorted by the column and the order given", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("topic", { ascending: true });
+      });
+  });
+  test("400: responds with an appropriate error message when given an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: responds with an appropriate error message when given an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=invalid")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
       });
   });
 });
