@@ -225,6 +225,42 @@ describe("POST: /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Bad Request");
       });
   });
+  test("400: responds with an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .post("/api/articles/not-an-id/comments")
+      .send({
+        username: "icellusedkars",
+        body: "Hit me up if you wanna sell your wheelz",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("404: responds with an appropriate status and error message when given a non-existent id", () => {
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send({
+        username: "icellusedkars",
+        body: "Hit me up if you wanna sell your wheelz",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
+      });
+  });
+  test("404: responds with the appropriate status and error message when given a username that does not exist", () => {
+    return request(app)
+      .post("/api/articles/9/comments")
+      .send({
+        username: "idontexist",
+        body: "I should not be adding a comment without an account",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
+      });
+  });
 });
 
 describe("PATCH: /api/articles/:article_id", () => {
@@ -252,6 +288,28 @@ describe("PATCH: /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request");
+      });
+  });
+  test("400: responds with an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .patch("/api/articles/not-an-id")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("404: responds with an appropriate status and error message when given a non-existent id", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
       });
   });
 });
