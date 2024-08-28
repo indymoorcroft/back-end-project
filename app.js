@@ -8,6 +8,7 @@ const {
 const {
   getCommentsById,
   postComment,
+  deleteCommentById,
 } = require("./controllers/comment-controllers");
 
 const express = require("express");
@@ -29,6 +30,8 @@ app.post("/api/articles/:article_id/comments", postComment);
 
 app.patch("/api/articles/:article_id", patchArticleVote);
 
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
 app.use((err, req, res, next) => {
   if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad Request" });
@@ -38,7 +41,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.msg === "Article not found") {
+  if (err.msg === "Article not found" || err.msg === "Comment not found") {
     res.status(404).send(err);
   } else {
     next(err);

@@ -29,3 +29,16 @@ exports.createNewComment = (comment, id) => {
       return rows[0];
     });
 };
+
+exports.removeCommentById = (id) => {
+  return db
+    .query("SELECT * FROM comments where comment_id = $1", [id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ msg: "Comment not found" });
+      }
+      return db.query("DELETE FROM comments WHERE comment_id = $1", [
+        rows[0].comment_id,
+      ]);
+    });
+};
