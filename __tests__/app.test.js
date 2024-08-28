@@ -76,6 +76,26 @@ describe("GET: /api/articles", () => {
   });
 });
 
+describe("GET: api/users", () => {
+  test("200: responds with all of the users in an array", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
+
 describe("GET: /api/articles/:article_id", () => {
   test("200: responds with article object that matches the given id", () => {
     return request(app)
