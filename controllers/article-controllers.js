@@ -1,6 +1,7 @@
 const {
   selectAllArticles,
   selectArticleById,
+  createArticle,
   updateArticleVote,
 } = require("../models/article-models");
 
@@ -20,6 +21,17 @@ exports.getArticleById = (req, res, next) => {
   selectArticleById(article_id)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postArticle = (req, res, next) => {
+  const { body } = req;
+  createArticle(body)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch((err) => {
       next(err);
