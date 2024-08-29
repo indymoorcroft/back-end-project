@@ -244,15 +244,77 @@ describe("GET: /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("POST: /api/articles", () => {
+  test("201: adds a new article and responds with the newly created article", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop",
+        title: "There's a new moewvelous cat in town!",
+        body: "Her name is Melor. She like belly scratches and St Luke's Garden",
+        topic: "cats",
+        article_img_url:
+          "https://www.istockphoto.com/photo/close-up-portrait-of-black-cat-gm1616213783-531307336",
+      })
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article).toEqual(
+          expect.objectContaining({
+            author: "rogersop",
+            title: "There's a new moewvelous cat in town!",
+            body: "Her name is Melor. She like belly scratches and St Luke's Garden",
+            topic: "cats",
+            article_img_url:
+              "https://www.istockphoto.com/photo/close-up-portrait-of-black-cat-gm1616213783-531307336",
+            article_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0,
+          })
+        );
+      });
+  });
+  test("400: responds with an appropriate status and error message when provided without a body", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop",
+        title: "There's a new moewvelous cat in town!",
+        topic: "cats",
+        article_img_url:
+          "https://www.istockphoto.com/photo/close-up-portrait-of-black-cat-gm1616213783-531307336",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("404: responds with the appropriate status and error message when given a author that does not exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "idontexist",
+        title: "I cannot write an article without having a username!",
+        body: "This should definitely not be allowed. Please cause an error",
+        topic: "cats",
+        article_img_url:
+          "https://www.istockphoto.com/photo/close-up-portrait-of-black-cat-gm1616213783-531307336",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
+      });
+  });
+});
+
 describe("POST: /api/articles/:article_id/comments", () => {
   test("201: adds a comment for an article and responds with the posted comment", () => {
-    const newComment = {
-      username: "icellusedkars",
-      body: "Hit me up if you wanna sell your wheelz",
-    };
     return request(app)
       .post("/api/articles/9/comments")
-      .send(newComment)
+      .send({
+        username: "icellusedkars",
+        body: "Hit me up if you wanna sell your wheelz",
+      })
       .expect(201)
       .then(({ body: { comment } }) => {
         expect(comment).toEqual(

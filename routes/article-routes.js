@@ -1,6 +1,7 @@
 const {
   getArticles,
   getArticleById,
+  postArticle,
   patchArticleVote,
 } = require("../controllers/article-controllers");
 const {
@@ -16,6 +17,8 @@ articleRouter.get("/api/articles", getArticles);
 articleRouter.get("/api/articles/:article_id", getArticleById);
 
 articleRouter.get("/api/articles/:article_id/comments", getCommentsById);
+
+articleRouter.post("/api/articles", postArticle);
 
 articleRouter.post("/api/articles/:article_id/comments", postComment);
 
