@@ -87,7 +87,7 @@ describe("GET: /api/articles", () => {
       .get("/api/articles?order=asc")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("created_at", { ascending: true });
+        expect(articles).toBeSortedBy("created_at", { descending: false });
       });
   });
   test("200: responds with all of the articles sorted by the column and the order given", () => {
@@ -95,7 +95,7 @@ describe("GET: /api/articles", () => {
       .get("/api/articles?sort_by=topic&order=asc")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("topic", { ascending: true });
+        expect(articles).toBeSortedBy("topic", { descending: false });
       });
   });
   test("200: responds with articles filtered by topic", () => {
@@ -113,18 +113,27 @@ describe("GET: /api/articles", () => {
         });
       });
   });
-  test("404: responds with an appropriate error message when given an invalid sort_by query", () => {
+  test("200: responds with an empty array when the topic exists but has no related articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(0);
+        expect(Array.isArray(articles)).toBe(true);
+      });
+  });
+  test("400: responds with an appropriate error message when given an invalid sort_by query", () => {
     return request(app)
       .get("/api/articles?sort_by=invalid")
-      .expect(404)
+      .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad request");
       });
   });
-  test("404: responds with an appropriate error message when given an invalid order query", () => {
+  test("400: responds with an appropriate error message when given an invalid order query", () => {
     return request(app)
       .get("/api/articles?order=invalid")
-      .expect(404)
+      .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad request");
       });

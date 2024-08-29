@@ -27,8 +27,10 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.msg) {
+  if (err.msg === "Data not found") {
     res.status(404).send(err);
+  } else if (err.msg === "Bad request") {
+    res.status(400).send(err);
   } else {
     next(err);
   }
