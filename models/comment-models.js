@@ -30,6 +30,21 @@ exports.createNewComment = (comment, id) => {
     });
 };
 
+exports.updateArticleVote = (body, id) => {
+  const voteChange = Object.values(body)[0];
+  return db
+    .query(
+      "UPDATE comments SET votes = $1 + votes WHERE comment_id = $2 RETURNING *",
+      [voteChange, id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Data not found" });
+      }
+      return rows[0];
+    });
+};
+
 exports.removeCommentById = (id) => {
   return db
     .query("DELETE FROM comments WHERE comment_id = $1 RETURNING *", [id])

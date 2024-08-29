@@ -1,6 +1,7 @@
 const {
   selectCommentsById,
   createNewComment,
+  updateArticleVote,
   removeCommentById,
 } = require("../models/comment-models");
 
@@ -21,6 +22,18 @@ exports.postComment = (req, res, next) => {
   createNewComment(body, article_id)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchCommentVote = (req, res, next) => {
+  const { body } = req;
+  const { comment_id } = req.params;
+  updateArticleVote(body, comment_id)
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch((err) => {
       next(err);

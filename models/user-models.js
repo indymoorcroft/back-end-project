@@ -7,7 +7,6 @@ exports.selectAllUsers = () => {
 };
 
 exports.selectUserByUsername = (username) => {
-  console.log(username);
   return db
     .query("SELECT * FROM users WHERE username = $1", [username])
     .then(({ rows }) => {
