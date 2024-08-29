@@ -40,7 +40,7 @@ git clone https://github.com/indymoorcroft/back-end-project.git
 
 **Run tests:**
 
-npm test **tests**/app.test.js
+npm test \_\_tests\_\_/app.test.js
 
 **Create .env files:**
 
