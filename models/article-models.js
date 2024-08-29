@@ -24,7 +24,7 @@ exports.selectAllArticles = (sort_by = "created_at", order, topic) => {
   if (topic) {
     queryStr += ` WHERE articles.topic = $1`;
     queryVals.push(topic);
-    queryProms.push(checkExists("articles", "topic", topic));
+    queryProms.push(checkExists("topics", "slug", topic));
   }
 
   queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by}`;
