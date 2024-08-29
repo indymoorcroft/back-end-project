@@ -367,6 +367,57 @@ describe("PATCH: /api/articles/:article_id", () => {
   });
 });
 
+describe("PATCH: /api/comments/:comment_id", () => {
+  test("200: updates the votes on a comment when given the comment id", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            votes: 17,
+          })
+        );
+      });
+  });
+  test("400: responds with an appropriate status and error message when provided with the wrong data type", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({
+        inc_votes: "not a number",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("400: responds with an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .patch("/api/comments/not-an-id")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("404: responds with an appropriate status and error message when given a non-existent id", () => {
+    return request(app)
+      .patch("/api/comments/999")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
+      });
+  });
+});
+
 describe("DELETE: /api/comments/:comment_id", () => {
   test("204: deletes the specified comment and sends no body back", () => {
     return request(app).delete("/api/comments/1").expect(204);
