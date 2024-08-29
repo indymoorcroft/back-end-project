@@ -17,11 +17,13 @@ The server has been built using Test-Driven-Development to ensure software stabi
 
 # 📝 How to Build
 
-Cloning repo: In the command line where you would like the repository to sit in your file structure use:
+**Cloning repo:**
+
+In the command line where you would like the repository to sit in your file structure use:
 
 git clone https://github.com/indymoorcroft/back-end-project.git
 
-Dependencies to install:
+**Dependencies to install:**
 
 - dotenv
 - express
@@ -31,22 +33,22 @@ Dependencies to install:
 - jest
 - jest-sorted
 
-Set-up and Seed local database:
+**Set-up and Seed local database:**
 
 1. npm run setup-dbs
 2. npm run seed
 
-Run tests:
+**Run tests:**
 
 npm test **tests**/app.test.js
 
-Create .env files:
+**Create .env files:**
 
 There are two databases in this project: one for real-looking dev data, and another for simpler test data.
 
 You will need to create two .env files for your project: .env.test and .env.development. Into each, add PGDATABASE=, with the correct database name for that environment (see /db/setup.sql for the database names).
 
-Versions needed:
+**Versions needed:**
 
 - Node: >=6.9.0
 - Postgres: >=8.0
