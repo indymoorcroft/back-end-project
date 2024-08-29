@@ -1,9 +1,52 @@
-# Northcoders News API
+# 📰 Northcoders News API
 
-We'll have two databases in this project: one for real-looking dev data, and another for simpler test data.
+Hosted: https://nc-news-im.onrender.com/api
+
+# 🤖 About
+
+The nc-news API is a PostgreSQL database designed to access application data programmatically that mimics a real world backend service. It will provide the information to the front-end architecture. The server is able to:
+
+- Respond with a list of available endpoints
+- Respond with a list of topics, articles and users
+- Respond with a single article or article comments based on id
+- Allows articles to be filtered and sorted
+- Add and delete comments
+- Update an article by id
+
+The server has been built using Test-Driven-Development to ensure software stability.
+
+# 📝 How to Build
+
+Cloning repo: In the command line where you would like the repository to sit in your file structure use:
+
+git clone https://github.com/indymoorcroft/back-end-project.git
+
+Dependencies to install:
+
+- dotenv
+- express
+- pg
+- pg-format
+- supertest
+- jest
+- jest-sorted
+
+Set-up and Seed local database:
+
+1. npm run setup-dbs
+2. npm run seed
+
+Run tests:
+
+npm test **tests**/app.test.js
+
+Create .env files:
+
+There are two databases in this project: one for real-looking dev data, and another for simpler test data.
 
 You will need to create two .env files for your project: .env.test and .env.development. Into each, add PGDATABASE=, with the correct database name for that environment (see /db/setup.sql for the database names).
 
----
+Versions needed:
 
-This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
+- Node: >=6.9.0
+- Postgres: >=8.0
