@@ -8,12 +8,13 @@ The nc-news API is a PostgreSQL database designed to access application data pro
 
 - Respond with a list of available endpoints
 - Respond with a list of topics, articles and users
-- Respond with a single article or article comments based on id
+- Respond with a single article, article comments or user based on id
 - Allows articles to be filtered and sorted
-- Add and delete comments
-- Update an article by id
+- Add and delete articles and comments
+- Add topics
+- Update an article or a comment by id
 
-The server has been built using Test-Driven-Development to ensure software stability.
+The server has been built using Test-Driven-Development to ensure software stability. It includes pagination of articles and comments for better readability.
 
 # 📝 How to run locally
 
