@@ -19,7 +19,7 @@ jobs:
         with:
           postgresql db: "my_db"
           postgresql user: "test_user"
-          postgresql pw: "test_pw"
+          postgresql password: "test_pw"
       - name: Install dependencies
         run: npm ci
       - name: Run tests
