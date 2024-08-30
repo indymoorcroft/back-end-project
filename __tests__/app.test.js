@@ -404,8 +404,36 @@ describe("GET: /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("POST: /api/topics", () => {
+  test("201: adds a new topic and responds with the newly created topic object", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "mugs",
+        description: "a little bit tea-dious",
+      })
+      .then(({ body: { topic } }) => {
+        expect(topic).toEqual({
+          slug: "mugs",
+          description: "a little bit tea-dious",
+        });
+      });
+  });
+  test("400: responds with an appropriate status and error message when provided without a slug", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        description: "a little bit tea-dious",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+});
+
 describe("POST: /api/articles", () => {
-  test("201: adds a new article and responds with the newly created article", () => {
+  test("201: adds a new article and responds with the newly created article object", () => {
     return request(app)
       .post("/api/articles")
       .send({
