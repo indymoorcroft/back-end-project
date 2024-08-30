@@ -43,15 +43,12 @@ exports.selectAllArticles = (
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
-  limit = +limit;
-  p = +p - 1;
-
   if (!topic) {
     queryStr += ` LIMIT $1`;
     queryVals.push(limit);
     if (p) {
       queryStr += ` OFFSET $2`;
-      p = limit * p;
+      p = +limit * (+p - 1);
       queryVals.push(p);
     }
   } else {
@@ -59,7 +56,7 @@ exports.selectAllArticles = (
     queryVals.push(limit);
     if (p) {
       queryStr += ` OFFSET $3`;
-      p = limit * p;
+      p = +limit * (+p - 1);
       queryVals.push(p);
     }
   }

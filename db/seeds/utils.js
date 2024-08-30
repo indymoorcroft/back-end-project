@@ -32,3 +32,16 @@ exports.checkExists = (table, column, value) => {
     }
   });
 };
+
+exports.checkPage = (id, limit, page) => {
+  if (!isNaN(page)) {
+    return db
+      .query("SELECT * FROM comments WHERE article_id = $1", [id])
+      .then(({ rows }) => {
+        const pageLimit = Math.ceil(rows.length / limit);
+        if (+page > pageLimit) {
+          return Promise.reject({ msg: "Data not found" });
+        }
+      });
+  }
+};
