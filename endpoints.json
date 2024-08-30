@@ -23,8 +23,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles. Articles can be sorted by each column, ordered ascending or descending, and filtered by topic",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles. Articles can be sorted by each column, ordered asc or desc, filtered by topic, defaults to a limit of 10 articles, and can navigate to different pages",
+    "queries": ["topic", "sort_by", "order", "limit", "p"],
     "exampleResponse": {
       "articles": [
         {
@@ -35,7 +35,8 @@
           "created_at": "2018-05-30T15:59:13.341Z",
           "votes": 0,
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          "comment_count": 6
+          "comment_count": 6,
+          "total_count": 13
         }
       ]
     }
