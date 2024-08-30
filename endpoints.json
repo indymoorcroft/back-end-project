@@ -83,6 +83,15 @@
       }
     }
   },
+  "POST /api/topics": {
+    "description": "adds a new topic",
+    "example response": {
+      "topic": {
+        "slug": "mugs",
+        "description": "a little bit tea-dious"
+      }
+    }
+  },
   "POST /api/articles": {
     "description": "adds a new article",
     "example response": {
