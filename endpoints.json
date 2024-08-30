@@ -149,5 +149,8 @@
   },
   "DELETE /api/comments/:comment_id": {
     "description": "deletes a comment from an article based on id"
+  },
+  "DELETE /api/article/:article_id": {
+    "description": "deletes an article and its respective comments based on id"
   }
 }

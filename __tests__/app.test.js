@@ -250,6 +250,52 @@ describe("GET: /api/articles", () => {
   });
 });
 
+describe("GET: /api/users", () => {
+  test("200: responds with all of the users in an array", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
+
+describe("GET: /api/users/:username", () => {
+  test("responds with the username object that matches the given username", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then(({ body: { user } }) => {
+        expect(user).toEqual(
+          expect.objectContaining({
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          })
+        );
+      });
+  });
+  test("404: sends an appropriate status and error message when given a valid but non-existent username", () => {
+    return request(app)
+      .get("/api/users/not_a_username")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
+      });
+  });
+});
+
 describe("GET: /api/articles/:article_id", () => {
   test("200: responds with article object that matches the given id", () => {
     return request(app)
@@ -690,48 +736,24 @@ describe("DELETE: /api/comments/:comment_id", () => {
   });
 });
 
-describe("GET: /api/users", () => {
-  test("200: responds with all of the users in an array", () => {
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({ body: { users } }) => {
-        expect(users).toHaveLength(4);
-        users.forEach((user) => {
-          expect(user).toEqual(
-            expect.objectContaining({
-              username: expect.any(String),
-              name: expect.any(String),
-              avatar_url: expect.any(String),
-            })
-          );
-        });
-      });
+describe("DELETE: /api/articles/:article_id", () => {
+  test("204: deletes the specified article and its respective comments based on id and sends no body back", () => {
+    return request(app).delete("/api/articles/1").expect(204);
   });
-});
-
-describe("GET: /api/users/:username", () => {
-  test("responds with the username object that matches the given username", () => {
+  test("404: responds with an appropriate status and error message when given a non-existent id", () => {
     return request(app)
-      .get("/api/users/butter_bridge")
-      .expect(200)
-      .then(({ body: { user } }) => {
-        expect(user).toEqual(
-          expect.objectContaining({
-            username: "butter_bridge",
-            name: "jonny",
-            avatar_url:
-              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
-          })
-        );
-      });
-  });
-  test("404: sends an appropriate status and error message when given a valid but non-existent username", () => {
-    return request(app)
-      .get("/api/users/not_a_username")
+      .delete("/api/articles/999")
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Data not found");
+      });
+  });
+  test("400: responds with an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/articles/not-an-id")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
       });
   });
 });
