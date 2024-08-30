@@ -3,6 +3,7 @@ const {
   getArticleById,
   postArticle,
   patchArticleVote,
+  deleteArticleById,
 } = require("../controllers/article-controllers");
 const {
   getCommentsById,
@@ -23,5 +24,7 @@ articleRouter.post("/api/articles", postArticle);
 articleRouter.post("/api/articles/:article_id/comments", postComment);
 
 articleRouter.patch("/api/articles/:article_id", patchArticleVote);
+
+articleRouter.delete("/api/articles/:article_id", deleteArticleById);
 
 module.exports = articleRouter;
