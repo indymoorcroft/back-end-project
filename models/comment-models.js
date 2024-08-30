@@ -1,19 +1,33 @@
 const db = require("../db/connection");
-const { checkExists } = require("../db/seeds/utils");
+const { checkExists, checkPage } = require("../db/seeds/utils");
 
-exports.selectCommentsById = (id) => {
+exports.selectCommentsById = (id, limit = 10, p) => {
+  if (p !== undefined && isNaN(+p)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
   let queryStr =
-    "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC";
-  const queryProms = [];
+    "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC LIMIT $2";
+  const queryVals = [];
+  queryVals.push(id, limit);
 
+  const queryProms = [];
+  queryProms.push(checkPage(id, limit, p));
   queryProms.push(checkExists("articles", "article_id", id));
-  queryProms.push(db.query(queryStr, [id]));
+
+  if (p) {
+    queryStr += ` OFFSET $3`;
+    p = +limit * (+p - 1);
+    queryVals.push(p);
+  }
+
+  queryProms.push(db.query(queryStr, queryVals));
 
   return Promise.all(queryProms).then((results) => {
     if (results.length === 1) {
       return results[0].rows;
     } else {
-      return results[1].rows;
+      return results[2].rows;
     }
   });
 };

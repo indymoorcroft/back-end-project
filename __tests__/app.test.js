@@ -232,7 +232,7 @@ describe("GET: /api/articles", () => {
         expect(msg).toBe("Bad request");
       });
   });
-  test("400: responds with an appropriate error message when given an invalid page query", () => {
+  test("400: responds with an appropriate error message when given an invalid limit query", () => {
     return request(app)
       .get("/api/articles?limit=notalimit")
       .expect(400)
@@ -311,6 +311,57 @@ describe("GET: /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("200: article_id exists by has no related comments, responds with an empty array", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(0);
+        expect(Array.isArray(comments)).toBe(true);
+      });
+  });
+  test("200: responds with all of the comments sorted by created_at in descending order", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: responds with the comments limited to 10 by default", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(10);
+      });
+  });
+  test("200: responds with the comments limited by the number passed into the limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(5);
+      });
+  });
+  test("200: responds with the comments on the second page when passed a page query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=2")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(1);
+        expect(comments).toEqual([
+          {
+            comment_id: 9,
+            body: "Superficially charming",
+            article_id: 1,
+            author: "icellusedkars",
+            votes: 0,
+            created_at: "2020-01-01T03:08:00.000Z",
+          },
+        ]);
+      });
+  });
   test("404: sends an appropriate status and error message when given a valid but non-existent id", () => {
     return request(app)
       .get("/api/articles/999/comments")
@@ -327,21 +378,28 @@ describe("GET: /api/articles/:article_id/comments", () => {
         expect(msg).toBe("Bad request");
       });
   });
-  test("200: article_id exists by has no related comments, responds with an empty array", () => {
+  test("400: responds with an appropriate error message when given an invalid page query", () => {
     return request(app)
-      .get("/api/articles/2/comments")
-      .expect(200)
-      .then(({ body: { comments } }) => {
-        expect(comments).toHaveLength(0);
-        expect(Array.isArray(comments)).toBe(true);
+      .get("/api/articles/1/comments?p=notapage")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
       });
   });
-  test("200: responds with all of the comments sorted by created_at in descending order", () => {
+  test("400: responds with an appropriate error message when given an invalid limit query", () => {
     return request(app)
-      .get("/api/articles/1/comments")
-      .expect(200)
-      .then(({ body: { comments } }) => {
-        expect(comments).toBeSortedBy("created_at", { descending: true });
+      .get("/api/articles/1/comments?limit=notalimit")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: responds with an appropriate error message when given a valid page query that does not have data", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=3")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
       });
   });
 });

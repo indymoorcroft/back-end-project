@@ -23,7 +23,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles. Articles can be sorted by each column, ordered asc or desc, filtered by topic, defaults to a limit of 10 articles, and can navigate to different pages",
+    "description": "serves an array of all articles. Articles can be sorted by each column, ordered asc or desc, filtered by topic, defaults to a limit of 10 articles, and users can navigate the pages",
     "queries": ["topic", "sort_by", "order", "limit", "p"],
     "exampleResponse": {
       "articles": [
@@ -58,7 +58,8 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves the comments of a selected article based on id",
+    "description": "serves the comments of a selected article based on id. Defaults to a limit of 10 comments per page and users can navigate the pages",
+    "queries": ["limit", "p"],
     "example response": {
       "comments": [
         {
