@@ -15,23 +15,17 @@ The nc-news API is a PostgreSQL database designed to access application data pro
 
 The server has been built using Test-Driven-Development to ensure software stability.
 
-# 📝 How to Build
+# 📝 How to run locally
 
 **Cloning repo:**
 
-In the command line where you would like the repository to sit in your file structure use:
+In the command line 'cd' into the folder where you would like the repository to sit in your file structure. Then use:
 
 git clone https://github.com/indymoorcroft/back-end-project.git
 
-**Dependencies to install:**
+**Install dependencies:**
 
-- dotenv
-- express
-- pg
-- pg-format
-- supertest
-- jest
-- jest-sorted
+- run 'npm install'
 
 **Set-up and Seed local database:**
 
@@ -47,6 +41,8 @@ npm test \_\_tests\_\_/app.test.js
 There are two databases in this project: one for real-looking dev data, and another for simpler test data.
 
 You will need to create two .env files for your project: .env.test and .env.development. Into each, add PGDATABASE=, with the correct database name for that environment (see /db/setup.sql for the database names).
+
+Finally, run 'npm start' to run the server.
 
 **Versions needed:**
 
