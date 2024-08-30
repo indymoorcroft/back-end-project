@@ -1,7 +1,13 @@
 const db = require("../db/connection");
 const { checkExists } = require("../db/seeds/utils");
 
-exports.selectAllArticles = (sort_by = "created_at", order, topic) => {
+exports.selectAllArticles = (
+  sort_by = "created_at",
+  order,
+  topic,
+  limit = 10,
+  p
+) => {
   const validSortBys = [
     "title",
     "topic",
@@ -11,12 +17,12 @@ exports.selectAllArticles = (sort_by = "created_at", order, topic) => {
     "comment_count",
   ];
 
-  if (!validSortBys.includes(sort_by)) {
+  if (!validSortBys.includes(sort_by) || (p !== undefined && isNaN(+p))) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
   let queryStr =
-    "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
+    "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.article_id) AS INT) AS comment_count, CAST(COUNT(*) OVER() AS INT) AS total_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
 
   const queryVals = [];
   const queryProms = [];
@@ -37,11 +43,36 @@ exports.selectAllArticles = (sort_by = "created_at", order, topic) => {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
+  limit = +limit;
+  p = +p - 1;
+
+  if (!topic) {
+    queryStr += ` LIMIT $1`;
+    queryVals.push(limit);
+    if (p) {
+      queryStr += ` OFFSET $2`;
+      p = limit * p;
+      queryVals.push(p);
+    }
+  } else {
+    queryStr += ` LIMIT $2`;
+    queryVals.push(limit);
+    if (p) {
+      queryStr += ` OFFSET $3`;
+      p = limit * p;
+      queryVals.push(p);
+    }
+  }
+
   queryProms.push(db.query(queryStr, queryVals));
 
   return Promise.all(queryProms).then((results) => {
     if (results.length === 1) {
-      return results[0].rows;
+      if (results[0].rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Data not found" });
+      } else {
+        return results[0].rows;
+      }
     } else {
       return results[1].rows;
     }
