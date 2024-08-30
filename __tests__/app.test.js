@@ -49,7 +49,7 @@ describe("GET: /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -61,9 +61,86 @@ describe("GET: /api/articles", () => {
               votes: expect.any(Number),
               article_img_url: expect.any(String),
               comment_count: expect.any(Number),
+              total_count: 13,
             })
           );
         });
+      });
+  });
+  test("200: responds with the number of articles in an array that is in the limit query", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(5);
+      });
+  });
+  test("200: responds with correct articles in an array when given a page query", () => {
+    return request(app)
+      .get("/api/articles?p=2")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(3);
+        expect(articles).toEqual([
+          {
+            article_id: 8,
+            title: "Does Mitch predate civilisation?",
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-04-17T01:08:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 0,
+            total_count: 13,
+          },
+          {
+            article_id: 11,
+            title: "Am I a cat?",
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-01-15T22:21:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 0,
+            total_count: 13,
+          },
+          {
+            article_id: 7,
+            title: "Z",
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-01-07T14:08:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 0,
+            total_count: 13,
+          },
+        ]);
+      });
+  });
+  test("200: responds with correct articles in an array when given a limit and a page query", () => {
+    return request(app)
+      .get("/api/articles?limit=1&p=3")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(1);
+        expect(articles).toEqual([
+          {
+            article_id: 2,
+            title: "Sony Vaio; or, The Laptop",
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-10-16T05:03:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 0,
+            total_count: 13,
+          },
+        ]);
       });
   });
   test("200: responds with all of the articles sorted by date in descending order by default", () => {
@@ -98,9 +175,9 @@ describe("GET: /api/articles", () => {
         expect(articles).toBeSortedBy("topic", { descending: false });
       });
   });
-  test("200: responds with articles filtered by topic", () => {
+  test("200: responds with articles filtered by topic and reduces the total count", () => {
     return request(app)
-      .get("/api/articles?topic=mitch")
+      .get("/api/articles?topic=mitch&limit=15")
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(12);
@@ -108,6 +185,7 @@ describe("GET: /api/articles", () => {
           expect(article).toEqual(
             expect.objectContaining({
               topic: "mitch",
+              total_count: 12,
             })
           );
         });
@@ -141,6 +219,30 @@ describe("GET: /api/articles", () => {
   test("404: responds with an appropriate error message when given an invalid topic query", () => {
     return request(app)
       .get("/api/articles?topic=notatopic")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Data not found");
+      });
+  });
+  test("400: responds with an appropriate error message when given an invalid page query", () => {
+    return request(app)
+      .get("/api/articles?p=notapage")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: responds with an appropriate error message when given an invalid page query", () => {
+    return request(app)
+      .get("/api/articles?limit=notalimit")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: responds with an appropriate error message when given a valid page query that does not have data", () => {
+    return request(app)
+      .get("/api/articles?p=99")
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Data not found");
@@ -183,7 +285,7 @@ describe("GET: /api/articles/:article_id", () => {
       .get("/api/articles/not-an-id")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
 });
@@ -222,7 +324,7 @@ describe("GET: /api/articles/:article_id/comments", () => {
       .get("/api/articles/not-an-id/comments")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("200: article_id exists by has no related comments, responds with an empty array", () => {
@@ -286,7 +388,7 @@ describe("POST: /api/articles", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("404: responds with the appropriate status and error message when given a author that does not exist", () => {
@@ -337,7 +439,7 @@ describe("POST: /api/articles/:article_id/comments", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("400: responds with an appropriate status and error message when given an invalid id", () => {
@@ -349,7 +451,7 @@ describe("POST: /api/articles/:article_id/comments", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("404: responds with an appropriate status and error message when given a non-existent id", () => {
@@ -402,7 +504,7 @@ describe("PATCH: /api/articles/:article_id", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("400: responds with an appropriate status and error message when given an invalid id", () => {
@@ -413,7 +515,7 @@ describe("PATCH: /api/articles/:article_id", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("404: responds with an appropriate status and error message when given a non-existent id", () => {
@@ -453,7 +555,7 @@ describe("PATCH: /api/comments/:comment_id", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("400: responds with an appropriate status and error message when given an invalid id", () => {
@@ -464,7 +566,7 @@ describe("PATCH: /api/comments/:comment_id", () => {
       })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
   test("404: responds with an appropriate status and error message when given a non-existent id", () => {
@@ -497,7 +599,7 @@ describe("DELETE: /api/comments/:comment_id", () => {
       .delete("/api/comments/not-an-id")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad Request");
+        expect(msg).toBe("Bad request");
       });
   });
 });
