@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    name: Test
+    name: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -31,8 +31,8 @@ jobs:
         run: PGDATABASE=my_db PG_USER=test_user PGPASSWORD=test_pw npm t
 
   deploy:
+    needs: test
     runs-on: ubuntu-latest
-    needs: Test
     steps:
       - name: Deploy to Render
-        run: curl $\{{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: curl $\{{secrets.RENDER_DEPLOY_HOOK_URL}}
