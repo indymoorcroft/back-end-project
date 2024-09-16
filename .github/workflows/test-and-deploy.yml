@@ -22,13 +22,13 @@ jobs:
         with:
           postgresql db: "my_db"
           postgresql user: "test_user"
-          postgresql password: "test_pw"
+          postgresql password: "test_password"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests
-        run: PGDATABASE=my_db PG_USER=test_user PGPASSWORD=test_pw npm t
+        run: PGDATABASE=my_db PG_USER=test_user PGPASSWORD=test_password npm t
 
   deploy:
     needs: test

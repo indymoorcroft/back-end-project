@@ -5,9 +5,11 @@ const commentRoutes = require("./routes/comment-routes");
 const topicRoutes = require("./routes/topic-routes");
 const userRoutes = require("./routes/user-routes");
 
+const cors = require("cors");
 const express = require("express");
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/api", getEndpoints);
