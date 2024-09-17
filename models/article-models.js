@@ -15,6 +15,7 @@ exports.selectAllArticles = (
     "created_at",
     "article_img_url",
     "comment_count",
+    "votes",
   ];
 
   if (!validSortBys.includes(sort_by) || (p !== undefined && isNaN(+p))) {
